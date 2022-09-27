@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 export const useClock = () => {
   const [time, setTime] = useState({
-    workTime: 15,
+    workTime: 25,
     shortTime: 5,
     longTime: 15,
 });
@@ -78,7 +78,7 @@ export const useClock = () => {
             setCurrentTime((currentTime) =>
               currentTime >= 1 ? currentTime - 1 : 0
             );
-        }, 10);
+        }, 1000);
 
         return () => {
           clearInterval(interval.current);
@@ -93,7 +93,7 @@ export const useClock = () => {
             setCurrentTime((currentTime) =>
               currentTime >= 1 ? currentTime - 1 : 0
             );
-        }, 10);
+        }, 1000);
 
         return () => {
           clearInterval(interval.current);
