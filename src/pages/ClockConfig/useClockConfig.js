@@ -1,90 +1,70 @@
-import { useEffect, useState,  useRef, useReducer } from "react";
+import { useEffect, useState, useRef, useReducer } from "react";
+import { useNavigate } from 'react-router-dom';
 
 export const useClockConfig = () => {
+  const initial = {
+    work: 0,
+    shortBreak: 0,
+    longBreak: 0,
+    sessions: 0,
+  };
 
-const initial = {
-  work: 0,
-  shortBreak: 0,
-  longBreak: 0,
-  sessions:0
-  
-} 
+  const handleChange = (prev, e) => {
+    const value = e.target.value;
 
-const handleChange = (prev, e) => {
-  const value = e.target.value
-
-  if (e.action === 'reset') {
-    return initial
-  }
- return ({
-    ...prev,
-    [e.target.name]: value
-  })
-
-
-}
-// setConfigTime({e: {action: 'reset'}})
-const [configTime, setConfigTime] = useReducer(handleChange, initial);
-
-
-const [play, isPlay] = useState(false)
-const [isCounting, setIsCounting] = useState(false);
-const [stepPomodoro, setStepPomodoro] = useState("work");
-
-
-
-const [currentTime, setCurrentTime] = useState(configTime.work);
-console.log('configTime', configTime.work)
-console.log('currentTime',currentTime)
-
-console.log('initial', initial)
+    if (e.action === "reset") {
+      return initial;
+    }
+    return {
+      ...prev,
+      [e.target.name]: value,
+    };
+  };
+  // setConfigTime({e: {action: 'reset'}})
+  const [configTime, setConfigTime] = useReducer(handleChange, initial);
+  const [isCounting, setIsCounting] = useState(false);
+  const [step, setStep] = useState("Work");
+  const [currentTime, setCurrentTime] = useState(configTime.work);
+  const [sessions, setSessions] = useState(configTime.session);
 
   const interval = useRef();
+  const navigate = useNavigate();
 
   const minutes = Math.floor(currentTime / 60);
   const seconds = Math.floor(currentTime % 60);
 
-  function startPomodoro() {
-
-    console.log("startPomodoro()", initial);
+  function start() {
     workPomodoro();
   }
 
   function workPomodoro() {
-    console.log("workPomodoro()");
     setIsCounting(true);
     setCurrentTime(configTime.work * 60);
-    console.log('currentTime222222', configTime.work)
-    setStepPomodoro("work");
+    setStep("Work");
   }
 
   function breakPomodoro() {
-    // console.log("intervalo");
-    // console.log(sessionsConfig);
-    // if (sessionsConfig > 1) {
-    //   setCurrentTime(configTime.shortBreak * 60);
-    //   setStepPomodoro("shortBreak");
-    // } else {
-    //   setCurrentTime(configTime.longBreak * 60);
-    //   setStepPomodoro("longBreak");
-    //   setHasFinished(true);
-    // }
+    if (sessions > 1) {
+      setCurrentTime(configTime.shortBreak * 60);
+      setStep("Short Break");
+      setSessions(sessions - 1);
+    } else {
+      setCurrentTime(configTime.longBreak * 60);
+      setStep("Long Break");
+    }
   }
 
   function endPomodoro() {
-    console.log("endPomodoro");
     setIsCounting(false);
-    setStepPomodoro("finished");
+    setStep("Ended");
   }
 
-
   function pause() {
-    clearInterval(interval.current)
+    clearInterval(interval.current);
   }
 
   useEffect(() => {
-    if (stepPomodoro === "work") {
-      console.log("pegou work true");
+    if (step === "Work") {
       if (currentTime > 0 && isCounting) {
         interval.current = setInterval(() => {
           isCounting &&
@@ -99,7 +79,7 @@ console.log('initial', initial)
       } else if (isCounting && currentTime === 0) {
         breakPomodoro();
       }
-    } else if (stepPomodoro !== "work") {
+    } else if (step !== "Work") {
       if (currentTime > 0 && isCounting) {
         interval.current = setInterval(() => {
           isCounting &&
@@ -111,24 +91,22 @@ console.log('initial', initial)
         return () => {
           clearInterval(interval.current);
         };
-      } else if (isCounting && currentTime === 0 && stepPomodoro === 'shortBreak') {
+      } else if (isCounting && currentTime === 0 && step === "Short Break") {
         workPomodoro();
-      } else if (isCounting && currentTime === 0 && stepPomodoro === 'longBreak') {
-       endPomodoro();
+      } else if (isCounting && currentTime === 0 && step === "Long Break") {
+        endPomodoro();
       }
-    } 
+    }
   }, [currentTime, isCounting, configTime]);
 
   return {
-    stepPomodoro,
-    startPomodoro,
+    step,
+    start,
     minutes,
     seconds,
     pause,
-    handleChange,
     configTime,
-    // handleChangeSession,
-    setConfigTime
-   
+    setConfigTime,
+    navigate
   };
 };

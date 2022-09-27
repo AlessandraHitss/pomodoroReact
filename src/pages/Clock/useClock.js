@@ -1,12 +1,14 @@
 import { useEffect, useState,  useRef } from "react";
+import { useNavigate } from 'react-router-dom';
+
 
 export const useClock = () => {
   const [time, setTime] = useState({
-    workTime: 1,
-    shortTime: 2,
-    longTime: 1,
+    workTime: 15,
+    shortTime: 5,
+    longTime: 15,
 });
-  const [sessions, setSessions,] = useState(2);
+  const [sessions, setSessions,] = useState(4);
   const [isCounting, setIsCounting] = useState(false);
 
 
@@ -15,6 +17,7 @@ export const useClock = () => {
   const [listTask, setListTask] = useState([])
 
   const interval = useRef();
+  const navigate = useNavigate();
 
   const minutes = Math.floor(currentTime / 60);
   const seconds = Math.floor(currentTime % 60);
@@ -75,7 +78,7 @@ export const useClock = () => {
             setCurrentTime((currentTime) =>
               currentTime >= 1 ? currentTime - 1 : 0
             );
-        }, 100);
+        }, 10);
 
         return () => {
           clearInterval(interval.current);
@@ -90,7 +93,7 @@ export const useClock = () => {
             setCurrentTime((currentTime) =>
               currentTime >= 1 ? currentTime - 1 : 0
             );
-        }, 100);
+        }, 10);
 
         return () => {
           clearInterval(interval.current);
@@ -110,5 +113,6 @@ export const useClock = () => {
     seconds,
     pause,
     listTask,
+    navigate
   };
 };

@@ -1,44 +1,65 @@
-import { Input } from "../../components/Inputs"
-import { useClockConfig } from "./useClockConfig"
+import { ButtonControl } from "../../components/ButtonControl";
+import { ClockPanel } from "../../components/ClockPanel";
+import { Input } from "../../components/Inputs";
+import { TitleAction } from "../../components/TitleAction";
+import * as S from "./styles";
+import { useClockConfig } from "./useClockConfig";
 
-export function ClockConfig () {
-    const {
-        navigate,
-        minutes,
-        seconds,
-        startPomodoro,
-        pause, 
-        stepPomodoro,
-        configTime,
-        handleChange,
-        handleChangeSession,
-        setConfigTime
-     
+export function ClockConfig() {
+  const {
+    navigate,
+    minutes,
+    seconds,
+    start,
+    pause,
+    step,
+    configTime,
+    setConfigTime,
+  } = useClockConfig();
+  return (
+    <S.BodyClockConfig>
+      <S.Container>
+        <Input
+          nameLabel={"work"}
+          label={"Work"}
+          value={configTime.work}
+          onChange={(e) => setConfigTime(e)}
+        />
+        <Input
+          nameLabel={"shortBreak"}
+          label={"Short Break"}
+          value={configTime.shortBreak}
+          onChange={(e) => setConfigTime(e)}
+        />
+        <Input
+          nameLabel={"longBreak"}
+          label={"Long Break"}
+          value={configTime.longBreak}
+          onChange={(e) => setConfigTime(e)}
+        />
+        <Input
+          nameLabel={"sessions"}
+          label={"Sessions"}
+          value={configTime.sessions}
+          onChange={(e) => setConfigTime(e)}
+        />
+   
+      </S.Container>
 
-    } = useClockConfig()
-    return (
-        <>
-
-        <Input nameLabel={'work'} label={"Work"} value={configTime.work} onChange={(e) => setConfigTime(e)}  />
-        <Input nameLabel={'shortBreak'} label={"Short Break"} value={configTime.shortBreak} onChange={(e) => setConfigTime(e)}  />
-        <Input nameLabel={'longBreak'} label={"Long Break"} value={configTime.longBreak} onChange={(e) => setConfigTime(e)} />
-        <Input nameLabel={'sessions'} label={"Sessions"} value={configTime.sessions} oonChange={(e) => setConfigTime(e)} />
-
-        <button>Iniciar </button>  
-     
-        <h1>{stepPomodoro}</h1>
-        
+      <S.Container>
+        <ClockPanel
+          minutes={`${minutes < 10 ? "0" : ""}${minutes}`}
+          seconds={`${seconds < 10 ? "0" : ""}${seconds}`}
+        />
         <div>
-        {minutes}
+          <TitleAction title={`| ${step}`} />
+          <S.Box>
+            <ButtonControl text={"Start"} onClick={start} />
+            <ButtonControl text={"Pause"} onClick={pause} />
+            <ButtonControl text={"Home"} onClick={() => navigate("/")} />
+          </S.Box>
         </div>
-        <div>:</div>
-        <div>
-           {seconds}
-        </div>
-
-        <button onClick={() => navigate('/')}>Home</button>
-        <button onClick={startPomodoro}>Iniciar</button>
-        <button onClick={pause}>Pause</button>
-        </>
-    )
+      </S.Container>
+    </S.BodyClockConfig>
+  );
 }
